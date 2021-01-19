@@ -1,0 +1,8 @@
+﻿  main.cpp
+LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+  Generating code
+  1 of 17 functions ( 5.9%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ControllerX.vcxproj -> C:\Users\Duong\Documents\Development\Projects\ControllerX\ControllerX\bin\x64\Release\ControllerX.exe
