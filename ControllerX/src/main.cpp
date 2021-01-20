@@ -7,9 +7,9 @@
 #define TRIGGER_RANGE 255
 
 /*----- Values can be changed based on preferences -----*/
-#define ANALOG_STICK_DEADZONE 0.1f
+#define ANALOG_STICK_DEADZONE 0.15f
 
-#define MOUSE_MOVE_SENSITIVITY 20.0f
+#define MOUSE_MOVE_SENSITIVITY 15.0f
 #define MOUSE_SCROLL_SENSITIVITY 80.0f
 
 #define TRIGGER_SENSITIVITY 0.25f
@@ -31,7 +31,12 @@ enum class KEYBOARD_BUTTON
 	CTRL = VK_CONTROL,
 	ESC = VK_ESCAPE,
 	ALT = VK_MENU,
-	SPACE = VK_SPACE
+	SPACE = VK_SPACE,
+	VOL_UP = VK_VOLUME_UP,
+	VOL_DOWN = VK_VOLUME_DOWN,
+	MEDIA_PLAY_PAUSE = VK_MEDIA_PLAY_PAUSE,
+	MEDIA_NEXT = VK_MEDIA_NEXT_TRACK,
+	MEDIA_PREVIOUS = VK_MEDIA_PREV_TRACK,
 };
 /*---------------------------------------------------------------*/
 
@@ -89,8 +94,16 @@ void simulate_left_mouse(DWORD trigger, DWORD& right_trigger_buffer);
 /// <param name="left_trigger_buffer"></param>
 void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer);
 
+/// <summary>
+/// Print current keymap to console.
+/// </summary>
+void print_keymap();
+
 int main()
 {
+	std::cout << "\n             ControllerX up and running...             \n" << std::endl;
+	print_keymap();
+
 	// Current input state
 	XINPUT_STATE input_state;
 	ZeroMemory(&input_state, sizeof(XINPUT_STATE));
@@ -119,7 +132,7 @@ int main()
 		// If controller is not connected then log an error then quit.
 		else
 		{
-			std::cout << "Error: Controller not connected" << std::endl;
+			std::cout << "\n            Error: Controller not connected            \n" << std::endl;
 			std::cin.get();
 			break;
 		}
@@ -178,6 +191,8 @@ void simulate_keyboard(GAMEPAD_BUTTON button, DWORD& button_buffer)
 		break;
 
 	case GAMEPAD_BUTTON::LEFT_STICK:
+		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_PLAY_PAUSE;
+		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_PLAY_PAUSE;
 		break;
 
 	case GAMEPAD_BUTTON::RIGHT_STICK:
@@ -189,18 +204,18 @@ void simulate_keyboard(GAMEPAD_BUTTON button, DWORD& button_buffer)
 		break;
 
 	case GAMEPAD_BUTTON::LEFT_SHOULDER:
-		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::TAB;
-		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::TAB;
+		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_PREVIOUS;
+		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_PREVIOUS;
 		break;
 
 	case GAMEPAD_BUTTON::RIGHT_SHOULDER:
-		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::ENTER;
-		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::ENTER;
+		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_NEXT;
+		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::MEDIA_NEXT;
 		break;
 
 	case GAMEPAD_BUTTON::A:
-		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::CTRL;
-		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::CTRL;
+		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::VOL_DOWN;
+		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::VOL_DOWN;
 		break;
 
 	case GAMEPAD_BUTTON::B:
@@ -214,8 +229,8 @@ void simulate_keyboard(GAMEPAD_BUTTON button, DWORD& button_buffer)
 		break;
 
 	case GAMEPAD_BUTTON::Y:
-		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::SPACE;
-		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::SPACE;
+		inputs[0].ki.wVk = (WORD)KEYBOARD_BUTTON::VOL_UP;
+		inputs[1].ki.wVk = (WORD)KEYBOARD_BUTTON::VOL_UP;
 		break;
 
 	default:
@@ -357,4 +372,28 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer)
 
 	// Send input to Windows
 	SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+}
+
+void print_keymap()
+{
+	std::cout << "   -------------------- Keymaps --------------------   " << std::endl;
+	std::cout << "  |          Left Stick   ---   Mouse Movement      |  " << std::endl;
+	std::cout << "  |         Right Stick   ---   Mouse Scroll        |  " << std::endl;
+	std::cout << "  |        Left Trigger   ---   Right Mouse Click   |  " << std::endl;
+	std::cout << "  |       Right Trigger   ---   Left Mouse Click    |  " << std::endl;
+	std::cout << "  |       Left Shoulder   ---   Media Previous      |  " << std::endl;
+	std::cout << "  |      Right Shoulder   ---   Media Next          |  " << std::endl;
+	std::cout << "  |   Left Stick Button   ---   Media Play/Pause    |  " << std::endl;
+	std::cout << "  |  Right Stick Button   ---   Middle Mouse Click  |  " << std::endl;
+	std::cout << "  |            D-Pad Up   ---   Up Arrow Key        |  " << std::endl;
+	std::cout << "  |          D-Pad Down   ---   Down Arrow Key      |  " << std::endl;
+	std::cout << "  |          D-Pad Left   ---   Left Arrow Key      |  " << std::endl;
+	std::cout << "  |         D-Pad Right   ---   Right Arrow Key     |  " << std::endl;
+	std::cout << "  |                   A   ---   Volume Down         |  " << std::endl;
+	std::cout << "  |                   B   ---   Esc                 |  " << std::endl;
+	std::cout << "  |                   X   ---   Alt                 |  " << std::endl;
+	std::cout << "  |                   Y   ---   Volume Up           |  " << std::endl;
+	std::cout << "  |                Back   ---   Windows Start Menu  |  " << std::endl;
+	std::cout << "  |               Start   ---   Exit Controllerx    |  " << std::endl;
+	std::cout << "   -------------------------------------------------   " << std::endl;
 }
