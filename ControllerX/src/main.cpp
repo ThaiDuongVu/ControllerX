@@ -101,7 +101,9 @@ void print_keymap();
 
 int main()
 {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
 	std::cout << "\n             ControllerX up and running...             \n" << std::endl;
+
 	print_keymap();
 
 	// Current input state
@@ -132,6 +134,7 @@ int main()
 		// If controller is not connected then log an error then quit.
 		else
 		{
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
 			std::cout << "\n            Error: Controller not connected            \n" << std::endl;
 			std::cin.get();
 			break;
@@ -376,6 +379,7 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer)
 
 void print_keymap()
 {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 	std::cout << "   -------------------- Keymaps --------------------   " << std::endl;
 	std::cout << "  |          Left Stick   ---   Mouse Movement      |  " << std::endl;
 	std::cout << "  |         Right Stick   ---   Mouse Scroll        |  " << std::endl;
