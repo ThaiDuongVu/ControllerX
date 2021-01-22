@@ -10,6 +10,12 @@ ControllerX currently supports 64-bit and 32-bit Windows Operation System.
 
 ---
 
+### Demo
+
+<img src="./images/demo.gif" width=640></img>
+
+---
+
 ### How to use
 
 You can build the project yourself or download one of the pre-built binaries.
@@ -33,10 +39,10 @@ Once downloaded, extract and open executable file to start using!
 
 ### Keymap
 
-<img src="./images/keymap.png"></img>
+<img src="./images/keymap.png" width=640></img>
 
 ---
 
 ### Contribution
 
-ControllerX is current feature-complete but if you have any idea on how to improve the program, feel free to make a pull request.
+ControllerX is currently feature-complete but if you have any idea on how to improve the program, feel free to make a pull request.
