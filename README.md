@@ -12,6 +12,10 @@ ControllerX currently supports 64-bit and 32-bit Windows Operation System.
 
 ### Demo
 
+[ControllerX demo](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+
+Just kidding `:)` here's the actual demo:
+
 <img src="./images/demo.gif" width=640></img>
 
 ---

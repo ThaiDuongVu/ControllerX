@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <windows.h>
 #include <xinput.h>
 #include <winuser.h>
@@ -99,16 +100,23 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer);
 /// </summary>
 void print_keymap();
 
+/// <summary>
+/// Process a user input command.
+/// </summary>
+/// <param name="command">User input command</param>
+void process_command(std::string command);
+
 int main()
 {
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
-	std::cout << "\n             ControllerX up and running...             \n" << std::endl;
-
 	print_keymap();
 
 	// Current input state
 	XINPUT_STATE input_state;
 	ZeroMemory(&input_state, sizeof(XINPUT_STATE));
+
+	// Current keyboard state
+	XINPUT_KEYSTROKE keystroke;
+	ZeroMemory(&keystroke, sizeof(keystroke));
 
 	// Buffer for gamepad buttons
 	DWORD button_buffer = 0;
@@ -117,9 +125,37 @@ int main()
 	// Buffer for gamepad left trigger
 	DWORD left_trigger_buffer = 2;
 
+	bool is_command_mode = false;
+	std::string command;
+
 	// Main program loop
 	while (true)
 	{
+		// Press F1 to enter command mode
+		if (GetKeyState(VK_F1) & 0x8000)
+		{
+			// Clear the console and give feedback
+			system("cls");
+			std::cout << "\n  Waiting for command....                              \n" << std::endl;
+			std::cout << "  ";
+			// Enter command mode
+			is_command_mode = true;
+		}
+
+		// If user is in command mode
+		if (is_command_mode)
+		{
+			// Get input command
+			std::cin >> command;
+			// Process given command
+			process_command(command);
+
+			// Print keymap
+			print_keymap();
+			// Exit command mode
+			is_command_mode = false;
+		}
+
 		// If controller is connected then simulate input
 		if (XInputGetState(0, &input_state) == ERROR_SUCCESS)
 		{
@@ -130,6 +166,9 @@ int main()
 
 			simulate_left_mouse(input_state.Gamepad.bRightTrigger, right_trigger_buffer);
 			simulate_right_mouse(input_state.Gamepad.bLeftTrigger, left_trigger_buffer);
+
+			// Delay by 1 milisecond
+			Sleep(1);
 		}
 		// If controller is not connected then log an error then quit.
 		else
@@ -273,9 +312,6 @@ void simulate_mouse_movement(double x, double y)
 	// Simulate mouse y movement
 	if (out_deadzone_y) current_y -= y / SHORT_RANGE * (double)MOUSE_MOVE_SENSITIVITY;
 
-	// Delay by 1 milisecond
-	Sleep(1);
-
 	// Update cursor position on screen
 	if (out_deadzone_x || out_deadzone_y) SetCursorPos((int)current_x, (int)current_y);
 }
@@ -379,8 +415,11 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer)
 
 void print_keymap()
 {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
+	std::cout << "\n             ControllerX up and running...             \n" << std::endl;
+
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-	std::cout << "   -------------------- Keymaps --------------------   " << std::endl;
+	std::cout << "   ---------------- Current Keymaps -----------------   " << std::endl;
 	std::cout << "  |          Left Stick   ---   Mouse Movement      |  " << std::endl;
 	std::cout << "  |         Right Stick   ---   Mouse Scroll        |  " << std::endl;
 	std::cout << "  |        Left Trigger   ---   Right Mouse Click   |  " << std::endl;
@@ -400,4 +439,16 @@ void print_keymap()
 	std::cout << "  |                Back   ---   Windows Start Menu  |  " << std::endl;
 	std::cout << "  |               Start   ---   Exit Controllerx    |  " << std::endl;
 	std::cout << "   -------------------------------------------------   " << std::endl;
+
+	std::cout << "\n            Press F1 to enter command mode.            \n" << std::endl;
+}
+
+void process_command(std::string command)
+{
+	if (command.length() == 0) return;
+
+	if (command == "help")
+	{
+		std::cout << "  Help" << std::endl;
+	}
 }
