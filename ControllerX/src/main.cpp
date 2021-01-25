@@ -101,6 +101,11 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer);
 void print_keymap();
 
 /// <summary>
+/// Print all commands available in command mode.
+/// </summary>
+void command_help();
+
+/// <summary>
 /// Process a user input command.
 /// </summary>
 /// <param name="command">User input command</param>
@@ -108,7 +113,10 @@ void process_command(std::string command);
 
 int main()
 {
-	print_keymap();
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);	
+	std::cout << "\n  ControllerX up and running...  " << std::endl;
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+	std::cout << "  Press F1 to enter command mode.  \n" << std::endl;
 
 	// Current input state
 	XINPUT_STATE input_state;
@@ -136,8 +144,11 @@ int main()
 		{
 			// Clear the console and give feedback
 			system("cls");
-			std::cout << "\n  Waiting for command....                              \n" << std::endl;
-			std::cout << "  ";
+
+			std::cout << "\n  Waiting for command..." << std::endl;
+			std::cout << "  Type \"help\" for the list of available commands.  \n" << std::endl;
+
+			std::cout << "> ";
 			// Enter command mode
 			is_command_mode = true;
 		}
@@ -150,8 +161,6 @@ int main()
 			// Process given command
 			process_command(command);
 
-			// Print keymap
-			print_keymap();
 			// Exit command mode
 			is_command_mode = false;
 		}
@@ -174,7 +183,7 @@ int main()
 		else
 		{
 			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-			std::cout << "\n            Error: Controller not connected            \n" << std::endl;
+			std::cout << "\n  Error: Controller not connected  \n" << std::endl;
 			std::cin.get();
 			break;
 		}
@@ -415,9 +424,6 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer)
 
 void print_keymap()
 {
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
-	std::cout << "\n             ControllerX up and running...             \n" << std::endl;
-
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 	std::cout << "   ---------------- Current Keymaps -----------------   " << std::endl;
 	std::cout << "  |          Left Stick   ---   Mouse Movement      |  " << std::endl;
@@ -439,16 +445,28 @@ void print_keymap()
 	std::cout << "  |                Back   ---   Windows Start Menu  |  " << std::endl;
 	std::cout << "  |               Start   ---   Exit Controllerx    |  " << std::endl;
 	std::cout << "   -------------------------------------------------   " << std::endl;
+}
 
-	std::cout << "\n            Press F1 to enter command mode.            \n" << std::endl;
+void command_help()
+{
+	std::cout << "  Available commands:" << std::endl;
+	std::cout << "> print_keymap: Print current controller to mouse/keyboard map." << std::endl;
 }
 
 void process_command(std::string command)
 {
+	std::cout << "" << std::endl;
+
 	if (command.length() == 0) return;
 
-	if (command == "help")
+	if (command._Equal("help"))
 	{
-		std::cout << "  Help" << std::endl;
+		command_help();
 	}
+	else if (command._Equal("print_keymap"))
+	{
+		print_keymap();
+	}
+
+	std::cout << "" << std::endl;
 }
