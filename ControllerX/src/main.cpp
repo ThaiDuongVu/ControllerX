@@ -8,10 +8,9 @@
 #define TRIGGER_RANGE 255
 
 /*----- Values can be changed based on preferences -----*/
-#define ANALOG_STICK_DEADZONE 0.15f
-
-#define MOUSE_MOVE_SENSITIVITY 15.0f
-#define MOUSE_SCROLL_SENSITIVITY 80.0f
+double analog_stick_deadzone = 0.15f;
+double mouse_move_sensitivity = 15.0f;
+double mouse_scroll_sensitivity = 80.0f;
 
 #define TRIGGER_SENSITIVITY 0.25f
 /*------------------------------------------------------*/
@@ -101,6 +100,11 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer);
 void print_keymap();
 
 /// <summary>
+/// Print current specification.
+/// </summary>
+void print_spec();
+
+/// <summary>
 /// Print all commands available in command mode.
 /// </summary>
 void command_help();
@@ -113,7 +117,7 @@ void process_command(std::string command);
 
 int main()
 {
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);	
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
 	std::cout << "\n  ControllerX up and running...  " << std::endl;
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 	std::cout << "  Press F1 to enter command mode.  \n" << std::endl;
@@ -145,6 +149,7 @@ int main()
 			// Clear the console and give feedback
 			system("cls");
 
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 			std::cout << "\n  Waiting for command..." << std::endl;
 			std::cout << "  Type \"help\" for the list of available commands.  \n" << std::endl;
 
@@ -158,11 +163,17 @@ int main()
 		{
 			// Get input command
 			std::cin >> command;
+			system("cls");
 			// Process given command
 			process_command(command);
 
 			// Exit command mode
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+			std::cout << "  Command mode exitted.  " << std::endl;
 			is_command_mode = false;
+
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+			std::cout << "  Press F1 to enter command mode again.  \n" << std::endl;
 		}
 
 		// If controller is connected then simulate input
@@ -311,15 +322,15 @@ void simulate_mouse_movement(double x, double y)
 
 	// Check whether analog stick movement is out of deadzone
 	// X axis deadzone check
-	bool out_deadzone_x = abs(x / SHORT_RANGE) > ANALOG_STICK_DEADZONE;
+	bool out_deadzone_x = abs(x / SHORT_RANGE) > analog_stick_deadzone;
 	// Y axis deadzone check
-	bool out_deadzone_y = abs(y / SHORT_RANGE) > ANALOG_STICK_DEADZONE;
+	bool out_deadzone_y = abs(y / SHORT_RANGE) > analog_stick_deadzone;
 
 	// If deadzone check complete then simulate movement
 	// Simulate mouse x movement
-	if (out_deadzone_x) current_x += x / SHORT_RANGE * (double)MOUSE_MOVE_SENSITIVITY;
+	if (out_deadzone_x) current_x += x / SHORT_RANGE * (double)mouse_move_sensitivity;
 	// Simulate mouse y movement
-	if (out_deadzone_y) current_y -= y / SHORT_RANGE * (double)MOUSE_MOVE_SENSITIVITY;
+	if (out_deadzone_y) current_y -= y / SHORT_RANGE * (double)mouse_move_sensitivity;
 
 	// Update cursor position on screen
 	if (out_deadzone_x || out_deadzone_y) SetCursorPos((int)current_x, (int)current_y);
@@ -333,22 +344,22 @@ void simulate_mouse_scroll(double x, double y)
 
 	// Check whether analog stick movement is out of deadzone
 	// X axis deadzone check
-	bool out_deadzone_x = abs(x / SHORT_RANGE) > ANALOG_STICK_DEADZONE;
+	bool out_deadzone_x = abs(x / SHORT_RANGE) > analog_stick_deadzone;
 	// Y axis deadzone check
-	bool out_deadzone_y = abs(y / SHORT_RANGE) > ANALOG_STICK_DEADZONE;
+	bool out_deadzone_y = abs(y / SHORT_RANGE) > analog_stick_deadzone;
 
 	// If x axis deadzone check complete then simulate vertical scroll
 	if (out_deadzone_x)
 	{
 		inputs[0].type = INPUT_MOUSE;
-		inputs[0].mi.mouseData = (DWORD)(x / SHORT_RANGE * (double)MOUSE_SCROLL_SENSITIVITY);
+		inputs[0].mi.mouseData = (DWORD)(x / SHORT_RANGE * (double)mouse_scroll_sensitivity);
 		inputs[0].mi.dwFlags = MOUSEEVENTF_WHEEL;
 	}
 	// If y axis deadzone check complete then simulate horizontal scroll
 	if (out_deadzone_y)
 	{
 		inputs[1].type = INPUT_MOUSE;
-		inputs[1].mi.mouseData = (DWORD)(y / SHORT_RANGE * (double)MOUSE_SCROLL_SENSITIVITY);
+		inputs[1].mi.mouseData = (DWORD)(y / SHORT_RANGE * (double)mouse_scroll_sensitivity);
 		inputs[1].mi.dwFlags = MOUSEEVENTF_HWHEEL;
 	}
 
@@ -447,17 +458,25 @@ void print_keymap()
 	std::cout << "   -------------------------------------------------   " << std::endl;
 }
 
+void print_spec()
+{
+	std::cout << "  Analog Stick Deadzone: " << analog_stick_deadzone << std::endl;
+	std::cout << "  Mouse Move Sensitivity: " << mouse_move_sensitivity << std::endl;
+	std::cout << "  Mouse Scroll Sensitivity: " << mouse_scroll_sensitivity << std::endl;
+}
+
 void command_help()
 {
 	std::cout << "  Available commands:" << std::endl;
-	std::cout << "> print_keymap: Print current controller to mouse/keyboard map." << std::endl;
+	std::cout << "> exit_command: Exit command mode.  " << std::endl;
+	std::cout << "> print_keymap: Print current controller to mouse/keyboard map.  " << std::endl;
+	std::cout << "> print_spec: Print current controller specification." << std::endl;
+	std::cout << "> exit: Exit ControllerX.  " << std::endl;
 }
 
 void process_command(std::string command)
 {
 	std::cout << "" << std::endl;
-
-	if (command.length() == 0) return;
 
 	if (command._Equal("help"))
 	{
@@ -466,6 +485,22 @@ void process_command(std::string command)
 	else if (command._Equal("print_keymap"))
 	{
 		print_keymap();
+	}
+	else if (command._Equal("print_spec"))
+	{
+		print_spec();
+	}
+	else if (command._Equal("exit_command"))
+	{
+		return;
+	}
+	else if (command._Equal("exit"))
+	{
+		quick_exit(0);
+	}
+	else
+	{
+		std::cout << "  Command not found.  " << std::endl;
 	}
 
 	std::cout << "" << std::endl;
