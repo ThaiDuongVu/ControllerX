@@ -11,8 +11,7 @@
 double analog_stick_deadzone = 0.15f;
 double mouse_move_sensitivity = 15.0f;
 double mouse_scroll_sensitivity = 80.0f;
-
-#define TRIGGER_SENSITIVITY 0.25f
+double trigger_sensitivity = 0.25f;
 /*------------------------------------------------------*/
 
 /*----- More keys can be added/removed based on preferences -----*/
@@ -374,7 +373,7 @@ void simulate_left_mouse(DWORD trigger, DWORD& right_trigger_buffer)
 	ZeroMemory(inputs, sizeof(inputs));
 
 	// If current trigger value exceeds trigger threshold then simulate a mouse click
-	if ((double)(trigger / TRIGGER_RANGE) >= TRIGGER_SENSITIVITY)
+	if ((double)(trigger / TRIGGER_RANGE) >= trigger_sensitivity)
 	{
 		// If mouse is already down (trigger buffer is set) then do nothing
 		if (right_trigger_buffer == 1) return;
@@ -407,7 +406,7 @@ void simulate_right_mouse(DWORD trigger, DWORD& left_trigger_buffer)
 	ZeroMemory(inputs, sizeof(inputs));
 
 	// If current trigger value exceeds trigger threshold then simulate a mouse click
-	if ((double)(trigger / TRIGGER_RANGE) >= TRIGGER_SENSITIVITY)
+	if ((double)(trigger / TRIGGER_RANGE) >= trigger_sensitivity)
 	{
 		// If mouse is already down (trigger buffer is set) then do nothing
 		if (left_trigger_buffer == 1) return;
