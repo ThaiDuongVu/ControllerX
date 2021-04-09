@@ -467,7 +467,6 @@ void print_spec()
 void command_help()
 {
 	std::cout << "  Available commands:" << std::endl;
-	std::cout << "> exit_command: Exit command mode.  " << std::endl;
 	std::cout << "> print_keymap: Print current controller to mouse/keyboard map.  " << std::endl;
 	std::cout << "> print_spec: Print current controller specification." << std::endl;
 	std::cout << "> exit: Exit ControllerX.  " << std::endl;
@@ -488,10 +487,6 @@ void process_command(std::string command)
 	else if (command._Equal("print_spec"))
 	{
 		print_spec();
-	}
-	else if (command._Equal("exit_command"))
-	{
-		return;
 	}
 	else if (command._Equal("exit"))
 	{
